@@ -41,7 +41,9 @@ public class ChatClient {
                 String receivedLine;
                 do {
                     receivedLine = socketClient.readLine();
-                    System.out.println(receivedLine);
+                    if(receivedLine != null){
+                        System.out.println(receivedLine);
+                    }
                 } while (receivedLine != null);
             } catch (IOException e) {
                 e.printStackTrace();

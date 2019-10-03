@@ -10,27 +10,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 public class ChatServer {
 
     private ServerSocket serverSocket;
-    private final int NUM_CLIENTS = 10;
+    private final int NUM_CLIENTS = 3;
     private List<UserHandler> userHandlers = new ArrayList<>();;
     private int clientsConnected = 0;
+    private Semaphore handlersLock = new Semaphore(1, true);
 
     public void start(int port) throws IOException, InterruptedException {
         serverSocket = new ServerSocket(port);
 
-        while (clientsConnected < NUM_CLIENTS) {
-            Socket clientSocket = serverSocket.accept();
-            UserHandler userHandler = new UserHandler(clientSocket, clientsConnected + 1);
-            userHandler.start();
-            userHandlers.add(userHandler);
-            clientsConnected++;
-        }
+        while (true) {
 
-        for (UserHandler userHandler : userHandlers) {
-            userHandler.join();
+            Thread.sleep(1);
+            if(clientsConnected < NUM_CLIENTS){
+                Socket clientSocket = serverSocket.accept();
+                UserHandler userHandler = new UserHandler(clientSocket, clientsConnected + 1);
+                userHandler.start();
+                handlersLock.acquire();
+
+                userHandlers.add(userHandler);
+                clientsConnected++;
+
+                handlersLock.release();
+            }
         }
     }
 
@@ -90,8 +96,6 @@ public class ChatServer {
             this.clientSocket = socket;
             this.index = index;
             this.username = "user" + index;
-
-            sendBroadcastMessage("---connected " + getUsername() + "---");
         }
 
         //send a message to connected user
@@ -105,6 +109,8 @@ public class ChatServer {
 
                 in = new BufferedReader(
                         new InputStreamReader(clientSocket.getInputStream()));
+
+                sendBroadcastMessage("---connected " + getUsername() + "---");
 
                 String inputLine;
                 boolean done = false;
@@ -151,10 +157,16 @@ public class ChatServer {
                     //out.println(inputLine);
                 }
 
+                handlersLock.acquire();
+
+                userHandlers.remove(this);
+                clientsConnected--;
+
+                handlersLock.release();
                 in.close();
                 out.close();
                 clientSocket.close();
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         }
