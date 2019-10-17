@@ -20,6 +20,7 @@ public class ChatClient {
 
     public void sendMessage(String msg) throws IOException {
         out.println(msg);
+
     }
 
     public String readLine() throws IOException {

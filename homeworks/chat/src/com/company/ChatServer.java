@@ -120,7 +120,7 @@ public class ChatServer {
                     //the first word is the command
                     switch (command){
                         case "name":
-                            username = inputLine.substring(4);
+                            tryChangeUsername(index - 1, inputLine.substring(4));
                             break;
                         case "info":
                             out.println(getFormattedUserInfo());
@@ -174,5 +174,17 @@ public class ChatServer {
         public String getUsername() {
             return username;
         }
+
+        public void setUsername(String username){
+            this.username = username;
+        }
+    }
+
+    private void tryChangeUsername(int index, String name) {
+        //make sure that the new name is unique and only set if it is
+        for(UserHandler userHandler: userHandlers){
+            if(userHandler.getUsername().equals(name)) return;
+        }
+        userHandlers.get(index).setUsername(name);
     }
 }
