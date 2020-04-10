@@ -1,6 +1,7 @@
 package org.elsys.fileshare;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.Column;
 import javax.persistence.OneToMany;
@@ -37,6 +38,10 @@ public class User {
     @NotNull
     @NotEmpty
     private String email;
+
+    public User() {
+
+    }
     // standard getters and setters
 
     public boolean isEnabled() {

@@ -36,10 +36,7 @@ public class UserService implements IUserService {
 
     private boolean emailExist(String email) {
         User user = repository.findByEmail(email);
-        if (user != null) {
-            return true;
-        }
-        return false;
+        return user != null;
     }
 
     @Override
