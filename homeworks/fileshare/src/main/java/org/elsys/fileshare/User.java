@@ -2,6 +2,7 @@ package org.elsys.fileshare;
 
 import org.jetbrains.annotations.NotNull;
 
+import javax.persistence.Column;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
@@ -21,15 +22,38 @@ public class User {
     private String password;
     private String matchingPassword;
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     @NotNull
-    @OneToMany
-    private List<String> roles;
+    private String role;
 
     @ValidEmail
     @NotNull
     @NotEmpty
     private String email;
     // standard getters and setters
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    @Column(name = "enabled")
+    private boolean enabled;
+
+    public User() {
+        super();
+        this.enabled=false;
+    }
 
     public String getFirstName() {
         return firstName;
@@ -75,7 +99,4 @@ public class User {
         this.roles = roles;
     }
 
-    public List<String> getRoles() {
-        return roles;
-    }
 }
