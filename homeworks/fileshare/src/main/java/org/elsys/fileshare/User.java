@@ -1,7 +1,9 @@
 package org.elsys.fileshare;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.security.core.GrantedAuthority;
 
+import javax.persistence.Column;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
@@ -29,6 +31,10 @@ public class User {
     @NotNull
     @NotEmpty
     private String email;
+
+    public User() {
+
+    }
     // standard getters and setters
 
     public String getFirstName() {

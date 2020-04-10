@@ -24,6 +24,12 @@ public class RegistrationController {
         return "registration";
     }
 
+    @GetMapping("/user/login")
+    public String showLoginForm(WebRequest request, Model model){
+        return  "login";
+
+    }
+
     @PostMapping("/user/registration")
     public ModelAndView registerUserAccount(
             @ModelAttribute("user") @Valid User accountDto,
@@ -52,6 +58,12 @@ public class RegistrationController {
         } catch (EmailExistsException e) {
             return null;
         }
+//        catch (UserAlreadyExistException uaeEx) {
+//            mav.addObject("message", "An account for that username/email already exists.");
+//            return mav;
+//            return null;
+//        }
+
         return registered;
     }
 }

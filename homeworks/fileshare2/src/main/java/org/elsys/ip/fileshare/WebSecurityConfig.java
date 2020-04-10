@@ -27,16 +27,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/home", "/register").permitAll()
+                .antMatchers("/", "/home", "/register")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
+                .loginPage("/login.html")
+                .loginProcessingUrl("/perform_login")
+                .defaultSuccessUrl("/homepage.html",true)
+                .failureUrl("/login.html?error=true")
                 .permitAll()
                 .and()
                 .logout()
                 .permitAll();
-    }
+
+
+}
 
     @Bean
     public PasswordEncoder passwordEncoder() {
