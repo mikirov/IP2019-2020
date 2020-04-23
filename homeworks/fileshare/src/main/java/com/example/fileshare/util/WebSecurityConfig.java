@@ -30,6 +30,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .authorizeRequests()
                 .antMatchers("/resources/**", "/registration").permitAll()
+                .regexMatchers("\\/registrationConfirm\\?token=.+").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
@@ -43,7 +44,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Bean
     public AuthenticationManager customAuthenticationManager() throws Exception {
-        return authenticationManager();
+//        return authenticationManager();
+        return new CustomAuthenticationManager();
     }
 
     @Autowired

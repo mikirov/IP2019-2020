@@ -1,7 +1,9 @@
 package com.example.fileshare.controller;
 
 
+import com.example.fileshare.model.VerificationToken;
 import com.example.fileshare.service.UserService;
+import com.example.fileshare.service.VerificationTokenService;
 import com.example.fileshare.util.OnRegistrationCompleteEvent;
 import com.example.fileshare.util.UserValidator;
 import com.example.fileshare.model.User;
@@ -14,8 +16,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.context.request.WebRequest;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Calendar;
 
 @Controller
 public class UserController {
@@ -27,11 +32,14 @@ public class UserController {
 
     private final ApplicationEventPublisher eventPublisher;
 
-    public UserController(UserService userService, SecurityService securityService, UserValidator userValidator, ApplicationEventPublisher eventPublisher) {
+    private final VerificationTokenService verificationTokenService;
+
+    public UserController(UserService userService, SecurityService securityService, UserValidator userValidator, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService) {
         this.userService = userService;
         this.securityService = securityService;
         this.userValidator = userValidator;
         this.eventPublisher = eventPublisher;
+        this.verificationTokenService = verificationTokenService;
     }
 
     @GetMapping("/registration")
@@ -57,7 +65,7 @@ public class UserController {
 
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userForm, appUrl));
 
-        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
+//        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
 
         return "redirect:/";
     }
@@ -72,5 +80,28 @@ public class UserController {
 
         return "login";
     }
+
+
+    @GetMapping("/registrationConfirm")
+    public String confirmRegistration
+            (WebRequest request, Model model, @RequestParam("token") String token) {
+
+        VerificationToken verificationToken = verificationTokenService.getVerificationToken(token);
+        if (verificationToken == null) {
+            return "redirect:/registration";
+        }
+
+        User user = verificationToken.getUser();
+        Calendar cal = Calendar.getInstance();
+        if ((verificationToken.getExpiryDate().getTime() - cal.getTime().getTime()) <= 0) {
+            return "redirect:/registration";
+        }
+        userService.enable(user);
+
+//        securityService.autoLogin(user.getUsername(), user.getPasswordConfirm());
+
+        return "redirect:/login";
+    }
+
 
 }

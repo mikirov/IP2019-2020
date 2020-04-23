@@ -33,7 +33,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void enable(User user) {
-        //TODO: set user to enabled and save
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 
     @Override
