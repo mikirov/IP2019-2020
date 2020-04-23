@@ -85,21 +85,13 @@
         <br>
         <button id="deleteFolderBtn" name="deleteFolder">Delete folder</button>
 
-<%--        <c:forEach items="files" var="file">--%>
-<%--              <li ${file} id="file"></li>--%>
-
-<%--              <label for="createFolderName">Create folder Name:</label>--%>
-<%--              <input type="text" name="createFolderName" id="createFolderName">--%>
-<%--              <button id="createFolderBtn">Create folder</button>--%>
-
-<%--              <label for="updateFolderName">Update folder Name:</label>--%>
-<%--              <input type="text" name="updateFolderName" id="updateFolderName">--%>
-<%--              <button name="updateFolderBtn" id="updateFolderBtn">Update Folder</button>--%>
-
-<%--              <button id="deleteFolderBtn" name="deleteFolder">Delete folder</button>--%>
-
-<%--          </c:forEach>--%>
   </ul>
+  <h4>Upload Single File:</h4>
+  <form method="POST" enctype="multipart/form-data" action="<c:url value="/upload-file"/>">
+      <input type="file" name="file"> <br/><br/>
+      <button type="submit">Submit</button>
+  </form>
+
 
 </body>
 </html>

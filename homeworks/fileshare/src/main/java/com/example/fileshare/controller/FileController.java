@@ -24,29 +24,10 @@ public class FileController {
 
     private final DirectoryRepository directoryRepository;
 
-//    @GetMapping("/")
-//    public String listAllFiles(Model model) {
-//
-//        model.addAttribute("files", storageService.loadAll().map(
-//                path -> ServletUriComponentsBuilder.fromCurrentContextPath()
-//                        .path("/download/")
-//                        .path(path.getFileName().toString())
-//                        .toUriString())
-//                .collect(Collectors.toList()));
-//
-//        return "welcome";
-//    }
-
     @GetMapping("/")
     public String listAllDirectories(Model model){
         System.out.println("String listAllDirectories(Model model)");
         model.addAttribute("files", storageService.loadAll());
-//              .map(
-//                  path -> ServletUriComponentsBuilder.fromCurrentContextPath()
-////            .path("/download/")
-//              .path(path.getFileName().toString())
-//              .toUriString())
-//              .collect(Collectors.toList()));
         System.out.println("files:");
         System.out.println(model.getAttribute("files"));
         return "welcome";
