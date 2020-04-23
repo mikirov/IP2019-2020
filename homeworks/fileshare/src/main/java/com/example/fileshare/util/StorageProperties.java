@@ -1,4 +1,4 @@
-package com.example.fileshare;
+package com.example.fileshare.util;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

@@ -1,4 +1,6 @@
-package com.example.fileshare;
+package com.example.fileshare.model;
+
+import com.example.fileshare.model.Role;
 
 import javax.persistence.*;
 import java.util.Set;

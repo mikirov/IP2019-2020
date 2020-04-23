@@ -1,6 +1,9 @@
-package com.example.fileshare;
+package com.example.fileshare.service;
 
 
+import com.example.fileshare.repository.UserRepository;
+import com.example.fileshare.model.Role;
+import com.example.fileshare.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

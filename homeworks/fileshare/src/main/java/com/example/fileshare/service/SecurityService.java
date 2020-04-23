@@ -1,4 +1,4 @@
-package com.example.fileshare;
+package com.example.fileshare.service;
 
 
 public interface SecurityService {

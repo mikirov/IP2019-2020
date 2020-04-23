@@ -1,6 +1,10 @@
-package com.example.fileshare;
+package com.example.fileshare.service;
 
 
+import com.example.fileshare.model.User;
+import com.example.fileshare.repository.RoleRepository;
+import com.example.fileshare.repository.UserRepository;
+import com.example.fileshare.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;

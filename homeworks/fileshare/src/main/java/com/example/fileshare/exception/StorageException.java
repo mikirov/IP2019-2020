@@ -1,4 +1,4 @@
-package com.example.fileshare;
+package com.example.fileshare.exception;
 
 public class StorageException extends RuntimeException {
 

@@ -1,4 +1,4 @@
-package com.example.fileshare;
+package com.example.fileshare.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

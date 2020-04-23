@@ -1,6 +1,8 @@
-package com.example.fileshare;
+package com.example.fileshare.util;
 
 
+import com.example.fileshare.model.User;
+import com.example.fileshare.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
