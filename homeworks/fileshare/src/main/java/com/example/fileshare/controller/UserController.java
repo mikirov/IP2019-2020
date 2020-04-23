@@ -2,10 +2,12 @@ package com.example.fileshare.controller;
 
 
 import com.example.fileshare.service.UserService;
+import com.example.fileshare.util.OnRegistrationCompleteEvent;
 import com.example.fileshare.util.UserValidator;
 import com.example.fileshare.model.User;
 import com.example.fileshare.service.SecurityService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,16 +15,24 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 public class UserController {
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private SecurityService securityService;
+    private final SecurityService securityService;
 
-    @Autowired
-    private UserValidator userValidator;
+    private final UserValidator userValidator;
+
+    private final ApplicationEventPublisher eventPublisher;
+
+    public UserController(UserService userService, SecurityService securityService, UserValidator userValidator, ApplicationEventPublisher eventPublisher) {
+        this.userService = userService;
+        this.securityService = securityService;
+        this.userValidator = userValidator;
+        this.eventPublisher = eventPublisher;
+    }
 
     @GetMapping("/registration")
     public String registration(Model model) {
@@ -32,14 +42,20 @@ public class UserController {
     }
 
     @PostMapping("/registration")
-    public String registration(@ModelAttribute("userForm") User userForm, BindingResult bindingResult) {
+    public String registration(@ModelAttribute("userForm") User userForm,
+                               BindingResult bindingResult,
+                               HttpServletRequest request) {
         userValidator.validate(userForm, bindingResult);
 
         if (bindingResult.hasErrors()) {
             return "registration";
         }
 
+        String appUrl = request.getContextPath();
+
         userService.save(userForm);
+
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userForm, appUrl));
 
         securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
 
