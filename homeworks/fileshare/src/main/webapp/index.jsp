@@ -86,12 +86,21 @@
         <button id="deleteFolderBtn" name="deleteFolder">Delete folder</button>
 
   </ul>
+
   <h4>Upload Single File:</h4>
   <form method="POST" enctype="multipart/form-data" action="<c:url value="/upload-file"/>">
       <input type="file" name="file"> <br/><br/>
       <button type="submit">Submit</button>
   </form>
 
+  <h2>All Uploaded Files:</h2>
+  <ul>
+      <c:forEach items="${files}" var="file">
+          <li ${file}>
+              <a href="${file}" target="_blank" >${file}</a>
+          </li>
+      </c:forEach>
+  </ul>
 
 </body>
 </html>
