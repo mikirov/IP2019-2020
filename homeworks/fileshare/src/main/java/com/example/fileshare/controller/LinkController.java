@@ -3,15 +3,18 @@ package com.example.fileshare.controller;
 import com.example.fileshare.model.File;
 import com.example.fileshare.model.Link;
 import com.example.fileshare.model.User;
+import com.example.fileshare.repository.UserRepository;
 import com.example.fileshare.service.FileService;
 import com.example.fileshare.service.LinkService;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
 public class LinkController {
 
 
@@ -19,9 +22,13 @@ public class LinkController {
 
     private final FileService fileService;
 
-    public LinkController(LinkService linkService, FileService fileService) {
+    private final UserRepository userRepository;
+
+    public LinkController(LinkService linkService, FileService fileService, UserRepository userRepository) {
         this.linkService = linkService;
         this.fileService = fileService;
+
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/{generatedName}")
@@ -42,21 +49,29 @@ public class LinkController {
             files.addAll(this.fileService.findFiles(owner, file));
         }
         model.addAttribute("files", files);
-        return "link";
+        return "index";
     }
 
     @PostMapping("/link/create")
     public String getLink(Model model,
                           @RequestParam("id") Integer fileId){
 
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
         File file = this.fileService.findFileById(fileId);
-        this.linkService.save(file);
-        return "redirect:/";
+        if(!file.getAuthor().equals(user)){
+            model.addAttribute("error", "Can't create link to file you don't own");
+            return "link";
+        }
+        String generatedName = this.linkService.save(file);
+        model.addAttribute("link", generatedName);
+        return "link";
     }
 
     @DeleteMapping("/link/delete")
     public String deleteLink(Model model,
                              @RequestParam("generatedName") String generatedName){
+
         this.linkService.delete(generatedName);
         return "redirect:/";
     }

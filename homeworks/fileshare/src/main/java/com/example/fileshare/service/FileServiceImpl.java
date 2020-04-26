@@ -18,22 +18,36 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void save(User user, String fileName, File parent) {
+    public void save(User user, String fileName, File parent, boolean isFolder) {
         File file = new File(fileName, user, parent);
+        file.setFolder(isFolder);
         fileRepository.save(file);
     }
 
     @Override
     public void delete(User user, int id) {
-        File file = fileRepository.findByAuthorAndId(user, id);
-        fileRepository.delete(file);
+        File file = fileRepository.findById(id);
+        if(file.getAuthor().equals(user)){
+            fileRepository.delete(file);
+        }
     }
 
     @Override
-    public void update(User user, int id, String newName) {
-        File file = fileRepository.findByAuthorAndId(user, id);
-        file.setName(newName);
-        fileRepository.save(file);
+    public void updateName(User user, int id, String newName) {
+        File file = fileRepository.findById(id);
+        if(file.getAuthor().equals(user)){
+            file.setName(newName);
+            fileRepository.save(file);
+        }
+    }
+
+    @Override
+    public void updateParent(User user, int id, File parent) {
+        File file = fileRepository.findById(id);
+        if(file.getAuthor().equals(user)){
+            file.setParent(parent);
+            fileRepository.save(file);
+        }
     }
 
     @Override
@@ -50,10 +64,6 @@ public class FileServiceImpl implements FileService {
         return fileRepository.findAllByAuthorAndParent(user, parent);
     }
 
-    @Override
-    public File findFileByAuthorAndId(User user, Integer id) {
-        return null;
-    }
 
     @Override
     public File findFileById(int id) {

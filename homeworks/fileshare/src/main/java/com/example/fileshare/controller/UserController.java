@@ -1,14 +1,13 @@
 package com.example.fileshare.controller;
 
 
+import com.example.fileshare.model.User;
 import com.example.fileshare.model.VerificationToken;
+import com.example.fileshare.service.SecurityService;
 import com.example.fileshare.service.UserService;
 import com.example.fileshare.service.VerificationTokenService;
 import com.example.fileshare.util.OnRegistrationCompleteEvent;
 import com.example.fileshare.util.UserValidator;
-import com.example.fileshare.model.User;
-import com.example.fileshare.service.SecurityService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

@@ -35,6 +35,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .formLogin()
                 .loginPage("/login")
+                .defaultSuccessUrl("/")
                 .permitAll()
                 .and()
                 .logout()
@@ -43,8 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationManager customAuthenticationManager() throws Exception {
-//        return authenticationManager();
+    public AuthenticationManager authenticationManager() throws Exception {
         return new CustomAuthenticationManager();
     }
 

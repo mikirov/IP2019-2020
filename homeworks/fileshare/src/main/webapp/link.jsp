@@ -12,12 +12,6 @@
 </head>
 <body>
 <span>${error}</span>
-<ul>
-    <c:forEach items="${files}" var="file">
-        <li ${file}>
-            <a href="${file}" target="_blank" >${file}</a>
-        </li>
-    </c:forEach>
-</ul>
+<span>#{link}</span>
 </body>
 </html>

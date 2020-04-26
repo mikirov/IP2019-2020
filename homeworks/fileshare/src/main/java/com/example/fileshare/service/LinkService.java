@@ -8,7 +8,7 @@ public interface LinkService {
 
     Link getLinkByFileName(String fileName);
 
-    void save(File file);
+    String save(File file);
 
     void delete(String name);
 }

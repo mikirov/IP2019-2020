@@ -11,9 +11,5 @@ public interface FileRepository extends JpaRepository<File, Integer> {
 
     List<File> findAllByAuthorAndParent(User user, File parent);
 
-    File findByAuthorAndNameAndParent(User user, String name, File parent);
-
-    File findByAuthorAndId(User user, int id);
-
     File findById(int id);
 }

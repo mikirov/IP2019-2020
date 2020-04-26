@@ -8,57 +8,8 @@
     <meta charset="utf-8">
     <title>Create an account</title>
     <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
-    <script>
-
-        $( document ).ready(function() {
-            console.log( "ready!" );
-
-            function getPath(element){
-                if(element.id === "root"){
-                    return "/"
-                }
-                return getPath(element.getParent()) + element.id + "/";
-            }
-
-            $("#createFolderBtn").click(function () {
-                console.log("$(\"#createFolderBtn\").click")
-                $.ajax({
-                    url: '127.0.0.1:8080/create-folder',
-                    type: 'POST',
-                    data: {name: $("#createFolderName").text , path: getPath(this)},
-                    success: function(result){
-                        location.reload();
-                    }
-                });
-            });
-
-            $("#updateFolderBtn").click(function () {
-                console.log("$(\"#updateFolderBtn\").click")
-                $.ajax({
-                    url: '127.0.0.1:8080/update-folder',
-                    type: 'PUT',
-                    data: {name: $("#updateFolderName").text , path: getPath(this)},
-                    success: function(result){
-                        location.reload();
-                    }
-                });
-            });
-
-
-            $("#deleteFolderBtn").click(function () {
-                console.log("$(\"#deleteFolderBtn\").click")
-                $.ajax({
-                    url: '127.0.0.1:8080/delete-folder',
-                    type: 'DELETE',
-                    data: {path: getPath(this)},
-                    success: function(result){
-                        location.reload();
-                    }
-                });
-            });
-        });
-
-    </script>
+    <link href="${contextPath}/resources/css/common.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -70,37 +21,49 @@
         <h2>Welcome ${pageContext.request.userPrincipal.name} | <a onclick="document.forms['logoutForm'].submit()">Logout</a></h2>
     </c:if>
   </div>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-  <script src="${contextPath}/resources/js/bootstrap.min.js"></script>
     <ul>
-        <li id="root">Root:</li>
+     <c:forEach items="${files}" var="file">
+         <li ${file}>
+             <c:if test="${file.folder == true}">
+                 <label for="fileId_${file.id}">File id:</label>
+                 <input id="fileId_${file.id}" disabled value="${file.id}">
+                 <button onclick="showFolder(${file.id})">Show folder</button>
+<%--                 <input type="hidden" id="${file.id}">--%>
+                 <label for="innerFolderName_${file.id}">Create inner folder name</label>
+                 <input type="text" name="innerFolderName" id="innerFolderName_${file.id}">
+                <button onclick="createFolder(${file.id})">Create folder</button>
 
-        <label for="createFolderName">Folder Name:</label>
-        <input type="text" name="createFolderName" id="createFolderName">
-        <button id="createFolderBtn">Create folder</button>
-        <br>
-        <label for="updateFolderName">Folder Name:</label>
-        <input type="text" name="updateFolderName" id="updateFolderName">
-        <button name="updateFolderBtn" id="updateFolderBtn">Update Folder</button>
-        <br>
-        <button id="deleteFolderBtn" name="deleteFolder">Delete folder</button>
+                 <label for="folderName_${file.id}">Update folder name</label>
+                 <input type="text" name="folderName" id="folderName_${file.id}">
+                 <button onclick="updateFolderName(${file.id})">Update folder name</button>
+
+                 <label for="folderParent_${file.id}">Update folder parent</label>
+                 <input type="text" name="folderParent" id="folderParent_${file.id}">
+                 <button onclick="updateFolderParent(${file.id})">Update folder parent</button>
+
+                 <button onclick="deleteFolder(${file.id})">Delete folder</button>
+                 <form method="POST" enctype="multipart/form-data" action="/file/upload">
+                     <input type="file" name="file"> <br/><br/>
+                     <button type="submit">Upload file</button>
+                 </form>
+                 <button onclick="createLink(${file.id})"></button>
+
+             </c:if>
+             <c:if test="${file.folder == false}">
+                 <a href="/file/download/${file.name}">download file</a>
+             </c:if>
+
+         </li>
+         
+     </c:forEach>
 
   </ul>
 
-  <h4>Upload Single File:</h4>
-  <form method="POST" enctype="multipart/form-data" action="<c:url value="/upload-file"/>">
-      <input type="file" name="file"> <br/><br/>
-      <button type="submit">Submit</button>
-  </form>
+  <label for="linkDelete">Delete link:</label>
+  <input id="linkDelete" type="text">
+  <button onclick="deleteLink()">Delete</button>
 
-  <h2>All Uploaded Files:</h2>
-  <ul>
-      <c:forEach items="${files}" var="file">
-          <li ${file}>
-              <a href="${file}" target="_blank" >${file}</a>
-          </li>
-      </c:forEach>
-  </ul>
-
+  <script src="${contextPath}/resources/js/index.js"></script>
+  <script src="${contextPath}/resources/js/bootstrap.min.js"></script>
 </body>
 </html>

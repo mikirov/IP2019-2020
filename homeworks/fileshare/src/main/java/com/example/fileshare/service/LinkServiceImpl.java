@@ -27,10 +27,11 @@ public class LinkServiceImpl implements LinkService {
     }
 
     @Override
-    public void save(File file) {
+    public String save(File file) {
         Link link = new Link(file);
         link.setGeneratedName(generateUniqueName());
         linkRepository.save(link);
+        return link.getGeneratedName();
     }
 
     @Override

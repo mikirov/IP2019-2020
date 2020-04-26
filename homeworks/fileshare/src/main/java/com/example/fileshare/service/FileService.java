@@ -7,17 +7,17 @@ import java.util.List;
 
 public interface FileService {
 
-    void save(User user, String fileName, File parent);
+    void save(User user, String fileName, File parent, boolean isFolder);
 
     void delete(User user, int id);
 
-    void update(User user, int id, String newName);
+    void updateName(User user, int id, String newName);
+
+    void updateParent(User user, int id, File parent);
 
     List<File> findRootFiles(User user);
 
     List<File> findFiles(User user, File parent);
-
-    File findFileByAuthorAndId(User user, Integer id);
 
     File findFileById(int id);
 }

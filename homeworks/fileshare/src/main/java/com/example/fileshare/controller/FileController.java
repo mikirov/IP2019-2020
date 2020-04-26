@@ -2,18 +2,17 @@ package com.example.fileshare.controller;
 
 import com.example.fileshare.model.File;
 import com.example.fileshare.model.User;
-import com.example.fileshare.repository.FileRepository;
+import com.example.fileshare.repository.UserRepository;
 import com.example.fileshare.service.FileService;
 import com.example.fileshare.service.LinkService;
 import com.example.fileshare.service.StorageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 
 @RestController
 public class FileController {
@@ -22,18 +21,22 @@ public class FileController {
 
     private final LinkService linkService;
 
+    private final UserRepository userRepository;
+
     private final FileService fileService;
 
-    public FileController(StorageService storageService, LinkService linkService, FileService fileService) {
+    public FileController(StorageService storageService, LinkService linkService, UserRepository userRepository, FileService fileService) {
         this.storageService = storageService;
         this.linkService = linkService;
+        this.userRepository = userRepository;
         this.fileService = fileService;
     }
 
-    @GetMapping("/download/{uniqueString}")
+
+    @GetMapping("file/download/{uniqueString}")
     @ResponseBody
     public ResponseEntity<Resource> download(@PathVariable("uniqueString") String uniqueString){
-        String fileName = linkService.getLinkByGeneratedName(uniqueString).getFileName();
+        String fileName = linkService.getLinkByGeneratedName(uniqueString).getFile().getName();
         Resource resource = storageService.loadAsResource(fileName);
 
         return ResponseEntity.ok()
@@ -43,9 +46,11 @@ public class FileController {
     }
 
 
-    @GetMapping("/download/{filename:.+}")
+    @GetMapping("/file/download/{filename:.+}")
     @ResponseBody
     public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
+
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
         Resource resource = storageService.loadAsResource(filename);
 
@@ -55,50 +60,19 @@ public class FileController {
                 .body(resource);
     }
 
-    @PostMapping("/upload-file")
+    @PostMapping("/file/upload")
     @ResponseBody
-    public String uploadFile(@RequestParam("file") MultipartFile file) {
-        String name = storageService.store(file);
+    public String uploadFile(@RequestParam("file") MultipartFile file,
+                             @RequestParam("parentId") Integer parentId) {
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/download/")
-                .path(name)
-                .toUriString();
+        String StoredFileName = storageService.store(file);
+
+        File parent = fileService.findFileById(parentId);
+        if(parent.getAuthor().equals(user)){
+            fileService.save(user, StoredFileName, parent, false);
+        }
 
         return "redirect:/";
     }
-
-
-
-    @PostMapping("/create-folder")
-    public String createFolder(@RequestParam("name") String name,
-                               @RequestParam("parentId") Integer parentId,
-                               Authentication authentication){
-        User user = (User)authentication.getPrincipal();
-        File parent = fileService.findFileByAuthorAndId(user, parentId);
-        fileService.save(user, name, parent);
-        return "redirect:/";
-
-    }
-
-
-    @PutMapping("update-folder")
-    public String updateFolder(@RequestParam("newName") String newName,
-                               @RequestParam("id") Integer folderId,
-                               Authentication authentication)
-    {
-        User user = (User)authentication.getPrincipal();
-        fileService.update(user, folderId, newName);
-        return "redirect:/";
-    }
-
-    @DeleteMapping("/delete-folder")
-    public String deleteFolder(@RequestParam("id") Integer folderId,
-                               Authentication authentication)
-    {
-        User user = (User)authentication.getPrincipal();
-        fileService.delete(user, folderId);
-        return "redirect:/";
-    }
-
 }

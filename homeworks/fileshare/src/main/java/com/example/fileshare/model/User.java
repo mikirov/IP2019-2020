@@ -3,6 +3,7 @@ package com.example.fileshare.model;
 import com.example.fileshare.model.Role;
 
 import javax.persistence.*;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -70,5 +71,23 @@ public class User {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return getId() == user.getId() &&
+                isEnabled() == user.isEnabled() &&
+                getUsername().equals(user.getUsername()) &&
+                getPassword().equals(user.getPassword()) &&
+                getPasswordConfirm().equals(user.getPasswordConfirm()) &&
+                Objects.equals(getRoles(), user.getRoles());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUsername(), getPassword(), isEnabled(), getPasswordConfirm(), getRoles());
     }
 }

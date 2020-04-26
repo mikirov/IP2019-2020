@@ -4,6 +4,7 @@ import javax.persistence.*;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Objects;
 
 @Entity
 public class VerificationToken {
@@ -57,5 +58,20 @@ public class VerificationToken {
         return expiryDate;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VerificationToken)) return false;
+        VerificationToken that = (VerificationToken) o;
+        return id.equals(that.id) &&
+                getToken().equals(that.getToken()) &&
+                getUser().equals(that.getUser()) &&
+                getExpiryDate().equals(that.getExpiryDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, getToken(), getUser(), getExpiryDate());
+    }
 }
 

@@ -41,11 +41,12 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             throw new DisabledException("1001");
         }
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
-        for (Role role : user.getRoles()){
-            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
-        }
+//        for (Role role : user.getRoles()){
+//            grantedAuthorities.add(new SimpleGrantedAuthority(role.getName()));
+//        }
+        grantedAuthorities.add(new SimpleGrantedAuthority("USER"));
 
-        return new UsernamePasswordAuthenticationToken(username, null, grantedAuthorities);
+        return new UsernamePasswordAuthenticationToken(username, password, grantedAuthorities);
     }
 
 }

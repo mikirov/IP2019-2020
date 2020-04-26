@@ -2,12 +2,32 @@ package com.example.fileshare.model;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 public class File {
+
+    public File() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof File)) return false;
+        File file = (File) o;
+        return getId() == file.getId() &&
+                isFolder() == file.isFolder() &&
+                getName().equals(file.getName()) &&
+                getAuthor().equals(file.getAuthor()) &&
+                getParent().equals(file.getParent());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getName(), isFolder(), getAuthor(), getParent());
+    }
 
     @Id
     public int id;
