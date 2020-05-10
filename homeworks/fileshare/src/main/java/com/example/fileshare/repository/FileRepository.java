@@ -1,15 +1,20 @@
 package com.example.fileshare.repository;
 
 import com.example.fileshare.model.File;
-import com.example.fileshare.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FileRepository extends JpaRepository<File, Integer> {
-    List<File> findAllByAuthor(User user);
 
-    List<File> findAllByAuthorAndParent(User user, File parent);
+    @Query(value = "SELECT * FROM file f WHERE f.user_id = ?1", nativeQuery = true)
+    List<File> findAllByAuthor(Integer userId);
 
-    File findById(int id);
+    @Query(value = "SELECT * FROM file f WHERE f.user_id = ?1 AND f.parent_id = ?2", nativeQuery = true)
+    List<File> findAllByAuthorAndParent(Integer userId, Integer parentId);
+
+    @Query(value = "SELECT * FROM file f WHERE f.id = ?1", nativeQuery = true)
+    Optional<File> findById(Integer id);
 }

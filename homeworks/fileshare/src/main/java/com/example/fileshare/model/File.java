@@ -30,6 +30,7 @@ public class File {
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
 
     @Column

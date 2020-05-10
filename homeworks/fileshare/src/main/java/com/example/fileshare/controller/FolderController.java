@@ -6,19 +6,20 @@ import com.example.fileshare.repository.UserRepository;
 import com.example.fileshare.service.FileService;
 import com.example.fileshare.service.LinkService;
 import com.example.fileshare.service.StorageService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
+@CrossOrigin
 public class FolderController {
 
     private final FileService fileService;
 
     private final UserRepository userRepository;
+
 
     public FolderController(StorageService storageService, LinkService linkService, FileService fileService, UserRepository userRepository) {
         this.fileService = fileService;
@@ -28,51 +29,82 @@ public class FolderController {
 
 
     @PostMapping("/folder/create")
-    public String createFolder(@RequestParam("name") String name,
-                               @RequestParam("parentId") Integer parentId){
+    public ResponseEntity<Object> createFolder(@RequestParam("name") String name,
+                                               @RequestParam("parentId") Integer parentId){
+        System.out.println("createFolder");
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        File parent = fileService.findFileById(parentId);
-        if(parent.getAuthor().equals(user)){
-            fileService.save(user, name, parent, true);
+        if(parentId == 0){
+            System.out.println("fileService.save(user, name, null, true);");
+            fileService.save(user, name, null, true);
+            return ResponseEntity.ok().build();
         }
-        else{
-            //TODO: set error message
+
+        else {
+            File parent = fileService.findFileById(parentId);
+            if(parent.getAuthor().equals(user)){
+                System.out.println("fileService.save(user, name, parent, true);");
+                fileService.save(user, name, parent, true);
+                return ResponseEntity.ok().build();
+            }
+            else{
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
         }
-        return "redirect:/";
 
     }
 
 
     @PutMapping("folder/update")
-    public String updateFolder(@RequestParam(value = "newName", required = false) String newName,
+    public ResponseEntity<Object> updateFolder(@RequestParam(value = "newName", required = false) String newName,
                                @RequestParam("id") Integer folderId,
                                @RequestParam(value = "newParentId", required = false) Integer newParentId)
     {
+        System.out.println("updateFolder");
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        if(newName == null && newParentId == null){
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
         if(newName != null){
             fileService.updateName(user, folderId, newName);
-
+            return ResponseEntity.ok().build();
         }
         if(newParentId != null){
             File parent = fileService.findFileById(newParentId);
+            if(parent == null){
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
             if(parent.getAuthor().equals(user)){
                 fileService.updateParent(user, folderId, parent);
+                return ResponseEntity.ok().build();
             }
             else{
-                //TODO: error message
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
             }
         }
-        return "redirect:/";
+        return  ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/folder/delete")
-    public String deleteFolder(@RequestParam("id") Integer folderId)
+    public ResponseEntity<Object> deleteFolder(@RequestParam("id") Integer folderId)
     {
+        System.out.println("deleteFolder");
+
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        fileService.delete(user, folderId);
-        return "redirect:/";
+        File file = fileService.findFileById(folderId);
+        if(file == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if(file.getAuthor().equals(user)){
+
+            fileService.delete(user, folderId);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok().build();
     }
 
 }

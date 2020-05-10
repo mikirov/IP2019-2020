@@ -4,16 +4,17 @@ import com.example.fileshare.model.File;
 import com.example.fileshare.model.User;
 import com.example.fileshare.repository.UserRepository;
 import com.example.fileshare.service.FileService;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@CrossOrigin
 public class IndexController {
 
     private final FileService fileService;
@@ -26,7 +27,9 @@ public class IndexController {
     }
 
     @GetMapping("/")
+    @ResponseStatus(HttpStatus.OK)
     public String listAll(Model model, @RequestParam(value = "parentId", required = false) Integer parentId){
+        System.out.println("listAll user:" + SecurityContextHolder.getContext().getAuthentication().getName());
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
         List<File> files = new ArrayList<>();

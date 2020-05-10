@@ -6,6 +6,8 @@ import com.example.fileshare.model.User;
 import com.example.fileshare.repository.UserRepository;
 import com.example.fileshare.service.FileService;
 import com.example.fileshare.service.LinkService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
+@CrossOrigin
 public class LinkController {
 
 
@@ -31,14 +34,18 @@ public class LinkController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("/{generatedName}")
+
+
+
+    @GetMapping("/link/{generatedName}")
+    @ResponseStatus(HttpStatus.OK)
     public String getFile(Model model,
                           @PathVariable String generatedName)
     {
         Link link = this.linkService.getLinkByGeneratedName(generatedName);
         if(link == null){
             model.addAttribute("error", "Invalid link");
-            return "link";
+            return "index";
         }
 
         File file = this.fileService.findFileById(link.getFile().getId());
@@ -53,27 +60,30 @@ public class LinkController {
     }
 
     @PostMapping("/link/create")
-    public String getLink(Model model,
-                          @RequestParam("id") Integer fileId){
-
+    public ResponseEntity<Object> createLink(@RequestParam("id") Integer fileId){
+        System.out.println("createLink");
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
         File file = this.fileService.findFileById(fileId);
         if(!file.getAuthor().equals(user)){
-            model.addAttribute("error", "Can't create link to file you don't own");
-            return "link";
+            System.out.println("!file.getAuthor().equals(user)");
+            return ResponseEntity.ok().body("Can't create link to file you don't own");
         }
         String generatedName = this.linkService.save(file);
-        model.addAttribute("link", generatedName);
-        return "link";
+        return  ResponseEntity.ok().body("http://localhost:8080/link/" + generatedName);
     }
 
     @DeleteMapping("/link/delete")
-    public String deleteLink(Model model,
-                             @RequestParam("generatedName") String generatedName){
+    public ResponseEntity<Object> deleteLink(@RequestParam("generatedName") String generatedName){
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+        Link link = linkService.getLinkByGeneratedName(generatedName);
 
+        if(!link.getFile().getAuthor().equals(user)){
+            System.out.println("!file.getAuthor().equals(user)");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
         this.linkService.delete(generatedName);
-        return "redirect:/";
+        return ResponseEntity.ok().build();
     }
 
 }

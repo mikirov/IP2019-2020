@@ -11,7 +11,6 @@
     <title>Resource sharing</title>
 </head>
 <body>
-<span>${error}</span>
-<span>#{link}</span>
+<span>${link}</span>
 </body>
 </html>

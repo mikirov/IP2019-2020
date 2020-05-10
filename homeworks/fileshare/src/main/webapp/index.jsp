@@ -21,36 +21,69 @@
         <h2>Welcome ${pageContext.request.userPrincipal.name} | <a onclick="document.forms['logoutForm'].submit()">Logout</a></h2>
     </c:if>
   </div>
+
+    <label for="innerFolderName_0">Create inner folder name</label>
+    <input type="text" name="innerFolderName" id="innerFolderName_0">
+    <button onclick="createFolder(0)">Create folder</button><br>
+
+  <form method="POST" enctype="multipart/form-data" action="<c:url value="/file/upload"/>">
+        <input type="file" name="file">
+        <button type="submit">Upload file</button>
+        <input type="hidden" name="parentId" value="0">
+  </form>
+    <c:if test="${error}">
+        <p>${error}</p>
+    </c:if>
+
     <ul>
      <c:forEach items="${files}" var="file">
          <li ${file}>
+             <label for="fileId_${file.id}">File id:</label>
+             <input id="fileId_${file.id}" disabled value="${file.id}"><br>
+
+             <label for="fileName_${file.id}"></label>
+             <input id="fileName_${file.id}" disabled value="${file.name}"><br>
+
+             <label for="fileType_${file.id}">Is folder:</label>
+             <input id="fileType_${file.id}" disabled value="${file.folder}"><br>
+
+             <label for="fileAuthor_${file.id}">File author</label>
+             <input id="fileAuthor_${file.id}" disabled value="${file.author.id}"><br>
+
+             <label for="fileParent_${file.id}">File parent Id:</label>
+             <input id="fileParent_${file.id}" disabled value="${file.parent.id}"><br>
+
+
+             <label for="folderParent_${file.id}">Update folder parent</label>
+             <input type="text" name="folderParent" id="folderParent_${file.id}">
+             <button onclick="updateFolderParent(${file.id})">Update folder parent</button><br>
+
+
+             <button onclick="createLink(${file.id})">Create Link</button><br>
+             <label for="createLink_${file.id}">Unique link</label>
+             <input id="createLink_${file.id}" disabled>
              <c:if test="${file.folder == true}">
-                 <label for="fileId_${file.id}">File id:</label>
-                 <input id="fileId_${file.id}" disabled value="${file.id}">
-                 <button onclick="showFolder(${file.id})">Show folder</button>
-<%--                 <input type="hidden" id="${file.id}">--%>
+
+                 <a href="http://localhost:8080/?parentId=${file.id}">Show folder</a><br>
                  <label for="innerFolderName_${file.id}">Create inner folder name</label>
                  <input type="text" name="innerFolderName" id="innerFolderName_${file.id}">
-                <button onclick="createFolder(${file.id})">Create folder</button>
+                <button onclick="createFolder(${file.id})">Create folder</button><br>
 
                  <label for="folderName_${file.id}">Update folder name</label>
                  <input type="text" name="folderName" id="folderName_${file.id}">
-                 <button onclick="updateFolderName(${file.id})">Update folder name</button>
+                 <button onclick="updateFolderName(${file.id})">Update folder name</button><br>
 
-                 <label for="folderParent_${file.id}">Update folder parent</label>
-                 <input type="text" name="folderParent" id="folderParent_${file.id}">
-                 <button onclick="updateFolderParent(${file.id})">Update folder parent</button>
-
-                 <button onclick="deleteFolder(${file.id})">Delete folder</button>
-                 <form method="POST" enctype="multipart/form-data" action="/file/upload">
-                     <input type="file" name="file"> <br/><br/>
+                 <form method="POST" enctype="multipart/form-data" action="<c:url value="/file/upload"/>">
+                     <input type="file" name="file">
                      <button type="submit">Upload file</button>
-                 </form>
-                 <button onclick="createLink(${file.id})"></button>
+                     <input type="hidden" name="parentId" value="${file.id}">
+                 </form><br>
+                 <button onclick="deleteFolder(${file.id})">Delete folder</button><br>
 
              </c:if>
              <c:if test="${file.folder == false}">
-                 <a href="/file/download/${file.name}">download file</a>
+                 <a href="/file/download?fileId=${file.id}">Download file</a><br>
+                 <button onclick="deleteFile(${file.id})">Delete file</button>
              </c:if>
 
          </li>
@@ -58,6 +91,10 @@
      </c:forEach>
 
   </ul>
+  </br>
+  <label>Visit link</label>
+  <input id="visitLink" type="text">
+  <button onclick="visitLink()">Visit</button></br>
 
   <label for="linkDelete">Delete link:</label>
   <input id="linkDelete" type="text">

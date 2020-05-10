@@ -8,13 +8,17 @@ import com.example.fileshare.service.LinkService;
 import com.example.fileshare.service.StorageService;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
-@RestController
+@Controller
+@CrossOrigin
 public class FileController {
 
     private final StorageService storageService;
@@ -33,27 +37,26 @@ public class FileController {
     }
 
 
-    @GetMapping("file/download/{uniqueString}")
+    @GetMapping("/file/download")
     @ResponseBody
-    public ResponseEntity<Resource> download(@PathVariable("uniqueString") String uniqueString){
-        String fileName = linkService.getLinkByGeneratedName(uniqueString).getFile().getName();
-        Resource resource = storageService.loadAsResource(fileName);
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + resource.getFilename() + "\"")
-                .body(resource);
-    }
-
-
-    @GetMapping("/file/download/{filename:.+}")
-    @ResponseBody
-    public ResponseEntity<Resource> downloadFile(@PathVariable String filename) {
-
+    public ResponseEntity<Resource> downloadFile(Model model, @RequestParam("fileId") Integer fileId) {
+        System.out.println("downloadFile");
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
-        Resource resource = storageService.loadAsResource(filename);
-
+        File file = fileService.findFileById(fileId);
+        if(file == null){
+            System.out.println("file == null");
+            return null;
+        }
+        if(!file.getAuthor().equals(user)){
+            System.out.println("!file.getAuthor().equals(user)");
+            return null;
+        }
+        Resource resource = storageService.loadAsResource(file.getName());
+        if(resource == null){
+            System.out.println("resource == null");
+            return null;
+        }
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + resource.getFilename() + "\"")
@@ -61,18 +64,47 @@ public class FileController {
     }
 
     @PostMapping("/file/upload")
-    @ResponseBody
-    public String uploadFile(@RequestParam("file") MultipartFile file,
-                             @RequestParam("parentId") Integer parentId) {
+    public String uploadFile(Model model,
+                             @RequestParam("file") MultipartFile file,
+                             @RequestParam(value = "parentId") Integer parentId) {
+        System.out.println("uploadFile");
         User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
 
         String StoredFileName = storageService.store(file);
 
-        File parent = fileService.findFileById(parentId);
-        if(parent.getAuthor().equals(user)){
-            fileService.save(user, StoredFileName, parent, false);
+        if(parentId == 0){
+            System.out.println("fileService.save(user, name, null, true);");
+            fileService.save(user, StoredFileName, null, false);
+            return "redirect:/";
+            //return ResponseEntity.ok().build();
         }
+        else{
+            File parent = fileService.findFileById(parentId);
+            if(parent.getAuthor().equals(user)){
+                fileService.save(user, StoredFileName, parent, false);
+            }
 
-        return "redirect:/";
+            return "redirect:/";
+        }
+    }
+
+    @DeleteMapping("file/delete")
+    public ResponseEntity<Object> deleteFile(Model model, @RequestParam("fileId") Integer fileId){
+
+        User user = userRepository.findByUsername(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        File file = fileService.findFileById(fileId);
+        if(file == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+        if(file.getAuthor().equals(user)){
+            storageService.delete(file.getName());
+
+            fileService.delete(user, fileId);
+        }
+        else{
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.ok().build();
     }
 }

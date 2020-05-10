@@ -22,11 +22,6 @@ public class LinkServiceImpl implements LinkService {
     }
 
     @Override
-    public Link getLinkByFileName(String fileName) {
-        return linkRepository.findByFileName(fileName);
-    }
-
-    @Override
     public String save(File file) {
         Link link = new Link(file);
         link.setGeneratedName(generateUniqueName());

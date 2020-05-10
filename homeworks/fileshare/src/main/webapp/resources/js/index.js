@@ -1,35 +1,31 @@
-function showFolder(id){
-    console.log("showFolder id:" + id);
-    $.ajax({
-        url: '127.0.0.1:8080/?parentId=' + id,
-        type: 'GET',
-    });
-}
-
 function createFolder(parentId){
     let name = document.getElementById("innerFolderName_" + parentId).value;
 
-    console.log("createFolder id:" + id + "name:" + name);
+    console.log("createFolder id:" + parentId + "name:" + name);
     $.ajax({
-        url: '127.0.0.1:8080/folder/create',
+        url: 'http://localhost:8080/folder/create',
         type: 'POST',
         data: {name: name , parentId: parentId},
-
+        success: function (res) {
+            console.log(res);
+            location.reload();
+        }
     });
+
 }
-
-
 
 function updateFolderName(id){
     const name = document.getElementById("folderName_" + id).value;
 
     console.log("updateFolderName id:" + id + "newName:" + name);
     $.ajax({
-        url: '127.0.0.1:8080/folder/update',
+        url: 'http://localhost:8080/folder/update',
         type: 'PUT',
         data: {id: id, newName: name},
-        success: function (result) {
-            console.log("updateFolderName success")
+        success: function (res) {
+            console.log(res);
+            location.href= "http://localhost:8080/";
+            location.reload();
         }
     });
 
@@ -40,11 +36,13 @@ function updateFolderParent(id){
     console.log("updateFolderParent id:" + id + "parentId:" + parentId);
 
     $.ajax({
-        url: '127.0.0.1:8080/folder/update',
+        url: 'http://localhost:8080/folder/update',
         type: 'PUT',
         data: {id: id, newParentId: parentId},
-        success: function (result) {
-            console.log("updateFolderParent success")
+        success: function (res) {
+            console.log(res);
+            location.href= "http://localhost:8080/";
+            location.reload();
         }
     });
 
@@ -52,11 +50,29 @@ function updateFolderParent(id){
 function deleteFolder(id){
     console.log("deleteFolder id:" + id);
     $.ajax({
-        url: '127.0.0.1:8080/folder/delete',
+        url: 'http://localhost:8080/folder/delete',
         type: 'DELETE',
         data: {id: id},
-        success: function (result) {
-            console.log("deleteFolder success")
+        success: function (res) {
+            console.log(res);
+            location.href= "http://localhost:8080/";
+
+            location.reload();
+        }
+    });
+}
+
+function deleteFile(id){
+    console.log("deleteFolder id:" + id);
+    $.ajax({
+        url: 'http://localhost:8080/file/delete',
+        type: 'DELETE',
+        data: {id: id},
+        success: function (res) {
+            console.log(res);
+            location.href= "http://localhost:8080/";
+
+            location.reload();
         }
     });
 }
@@ -64,10 +80,26 @@ function deleteFolder(id){
 function createLink(id){
     console.log("createLink id:" + id);
     $.ajax({
-        url: '127.0.0.1:8080/link/create',
-        data: {id: id}
+        url: 'http://localhost:8080/link/create',
+        type: 'POST',
+        data: {id: id},
+        success: function (res) {
+            console.log(res);
+            $("#createLink_" + id).val(res);
+        }
     });
 }
+
+function visitLink(){
+    const generatedName = document.getElementById("visitLink").value;
+
+    console.log("visitLink generatedName:" + generatedName);
+    $.ajax({
+        url: 'http://localhost:8080/link/' + generatedName,
+        type: 'GET'
+    });
+}
+
 
 function deleteLink(){
 
@@ -75,7 +107,12 @@ function deleteLink(){
 
     console.log("deleteLink generatedName:" + generatedName);
     $.ajax({
-        url: '127.0.0.1:8080/link/delete',
+        url: 'http://localhost:8080/link/delete',
+        type: 'DELETE',
         data: {generatedName: generatedName},
+        success: function (res) {
+            console.log(res);
+            location.reload();
+        }
     });
 }

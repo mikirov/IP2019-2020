@@ -10,6 +10,7 @@ import java.util.Objects;
 public class Link {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
 
     @Override

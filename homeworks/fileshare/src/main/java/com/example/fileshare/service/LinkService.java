@@ -6,8 +6,6 @@ import com.example.fileshare.model.Link;
 public interface LinkService {
     Link getLinkByGeneratedName(String generatedName);
 
-    Link getLinkByFileName(String fileName);
-
     String save(File file);
 
     void delete(String name);
