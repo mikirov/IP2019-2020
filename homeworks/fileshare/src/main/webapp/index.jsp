@@ -91,10 +91,6 @@
      </c:forEach>
 
   </ul>
-  </br>
-  <label>Visit link</label>
-  <input id="visitLink" type="text">
-  <button onclick="visitLink()">Visit</button></br>
 
   <label for="linkDelete">Delete link:</label>
   <input id="linkDelete" type="text">

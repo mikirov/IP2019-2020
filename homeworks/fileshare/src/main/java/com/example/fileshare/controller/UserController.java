@@ -23,17 +23,14 @@ import java.util.Calendar;
 public class UserController {
     private final UserService userService;
 
-    private final SecurityService securityService;
-
     private final UserValidator userValidator;
 
     private final ApplicationEventPublisher eventPublisher;
 
     private final VerificationTokenService verificationTokenService;
 
-    public UserController(UserService userService, SecurityService securityService, UserValidator userValidator, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService) {
+    public UserController(UserService userService, UserValidator userValidator, ApplicationEventPublisher eventPublisher, VerificationTokenService verificationTokenService) {
         this.userService = userService;
-        this.securityService = securityService;
         this.userValidator = userValidator;
         this.eventPublisher = eventPublisher;
         this.verificationTokenService = verificationTokenService;
@@ -61,8 +58,6 @@ public class UserController {
         userService.save(userForm);
 
         eventPublisher.publishEvent(new OnRegistrationCompleteEvent(userForm, appUrl));
-
-//        securityService.autoLogin(userForm.getUsername(), userForm.getPasswordConfirm());
 
         return "redirect:/";
     }
@@ -94,8 +89,6 @@ public class UserController {
             return "redirect:/registration";
         }
         userService.enable(user);
-
-//        securityService.autoLogin(user.getUsername(), user.getPasswordConfirm());
 
         return "redirect:/login";
     }

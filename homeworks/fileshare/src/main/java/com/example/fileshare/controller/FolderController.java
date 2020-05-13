@@ -4,8 +4,6 @@ import com.example.fileshare.model.File;
 import com.example.fileshare.model.User;
 import com.example.fileshare.repository.UserRepository;
 import com.example.fileshare.service.FileService;
-import com.example.fileshare.service.LinkService;
-import com.example.fileshare.service.StorageService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +19,7 @@ public class FolderController {
     private final UserRepository userRepository;
 
 
-    public FolderController(StorageService storageService, LinkService linkService, FileService fileService, UserRepository userRepository) {
+    public FolderController(FileService fileService, UserRepository userRepository) {
         this.fileService = fileService;
         this.userRepository = userRepository;
     }
